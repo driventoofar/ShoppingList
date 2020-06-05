@@ -1,0 +1,27 @@
+﻿@using Models;
+
+<div class="col-6">
+    <EditForm Model="@listItem" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <input id="item" class="form-control" @bind-value="listItem.Item" />
+        <ValidationMessage For="@(() => listItem.Item)" />
+        <input id="name" class="form-control" @bind-value="listItem.Name" />
+        <ValidationMessage For="@(() => listItem.Name)" />
+        <button id="submit" type="submit" class="btn btn-primary">Add</button>
+    </EditForm>
+</div>
+
+@code {
+
+    private ListItem listItem = new ListItem();
+
+    [Parameter]
+    public EventCallback<ListItem> OnFormSubmitted { get; set; }
+
+    private Task HandleValidSubmit()
+    {
+        var newItem = listItem;
+        listItem = new ListItem();
+        return OnFormSubmitted.InvokeAsync(newItem);
+    }
+}
