@@ -1,11 +1,12 @@
 ﻿@using Models;
 
+<h4>Add New Item</h4>
 <div class="col-6">
     <EditForm Model="@listItem" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
-        <input id="item" class="form-control" @bind-value="listItem.Item" />
+        <input id="item" placeholder="What would you like?" class="form-control" @bind-value="listItem.Item" />
         <ValidationMessage For="@(() => listItem.Item)" />
-        <input id="name" class="form-control" @bind-value="listItem.Name" />
+        <input id="name" placeholder="Who requested this?" class="form-control" @bind-value="listItem.Name" />
         <ValidationMessage For="@(() => listItem.Name)" />
         <button id="submit" type="submit" class="btn btn-primary">Add</button>
     </EditForm>
@@ -21,6 +22,7 @@
     private Task HandleValidSubmit()
     {
         var newItem = listItem;
+        newItem.Id = Guid.NewGuid();
         listItem = new ListItem();
         return OnFormSubmitted.InvokeAsync(newItem);
     }
