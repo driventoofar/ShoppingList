@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShoppingList.API.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace ShoppingList.API.Controllers
 {
@@ -14,25 +12,44 @@ namespace ShoppingList.API.Controllers
     [ApiController]
     public class ShoppingController : ControllerBase
     {
-        private readonly List<ListItem> _items = null;
+        private readonly ShoppingContext _context = null;
 
-        public ShoppingController()
+        public ShoppingController(ShoppingContext context)
         {
-            _items = new List<ListItem>()
+            _context = context;
+            var item = new ListItem
             {
-                new ListItem
-                {
-                    Id = Guid.NewGuid(),
-                    Item = "Apple",
-                    Name = "Andrew"
-                }
+                Id = Guid.NewGuid(),
+                Item = "Apple",
+                Name = "Andrew"
             };
+            _context.Add(item);
+            _context.SaveChanges();
         }
 
         [HttpGet]
-        public IEnumerable<ListItem> GetItems()
+        public async Task<ActionResult<ListItem>> GetItems()
         {
-            return _items;
+            var items = await _context.ShoppingList.ToListAsync();
+            return Ok(items);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ListItem>> Post(ListItem listItem)
+        {
+            _context.ShoppingList.Add(listItem);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(ListItem), new { id = listItem.Id }, listItem);
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<ListItem>> Delete(ListItem listItem)
+        {
+            _context.ShoppingList.Remove(listItem);
+            await _context.SaveChangesAsync();
+
+            return listItem;
         }
     }
 }

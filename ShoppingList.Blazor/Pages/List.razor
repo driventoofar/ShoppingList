@@ -50,14 +50,16 @@ else
         _items = await Http.GetFromJsonAsync<List<ListItem>>("https://localhost:44366/api/Shopping");
     }
 
-    public void AddToList(ListItem newItem)
+    private async Task AddToList(ListItem newItem)
     {
+        await Http.PostAsJsonAsync("https://localhost:44366/api/Shopping", newItem);
         _items.Add(newItem);
     }
 
-    public void DeleteItem(Guid id)
+    public async Task DeleteItem(Guid id)
     {
         var item = _items.FirstOrDefault(i => i.Id == id);
+        await Http.DeleteAsync("https://localhost:44366/api/Shopping");
         _items.Remove(item);
     }
 }
