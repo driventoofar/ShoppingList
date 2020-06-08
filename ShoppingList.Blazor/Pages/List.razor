@@ -6,37 +6,46 @@
 
 <h3>List</h3>
 
-@if (!_items.Any())
+@if (!loaded)
 {
-    <div>Add some items to the shopping list.</div>
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
 }
 else
 {
-    <div class="col-6">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Person</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in _items)
-                {
+    @if (!_items.Any())
+    {
+        <div>Add some items to the shopping list.</div>
+    }
+    else
+    {
+        <div class="col-6">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@item.Item</td>
-                        <td>@item.Name</td>
-                        <td>
-                            <button type="button" class="close" aria-label="Close" @onclick="@(e => DeleteItem(item.Id))">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </td>
+                        <th>Item</th>
+                        <th>Person</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in _items)
+                    {
+                        <tr>
+                            <td>@item.Item</td>
+                            <td>@item.Name</td>
+                            <td>
+                                <button type="button" class="close" aria-label="Close" @onclick="@(e => DeleteItem(item.Id))">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 }
 <hr />
 <AddItem OnFormSubmitted="AddToList"></AddItem>
@@ -45,9 +54,12 @@ else
 
     private List<ListItem> _items = new List<ListItem>();
 
+    private bool loaded = false;
+
     protected override async Task OnInitializedAsync()
     {
         _items = await Http.GetFromJsonAsync<List<ListItem>>("https://localhost:44366/api/Shopping");
+        loaded = true;
     }
 
     private async Task AddToList(ListItem newItem)
